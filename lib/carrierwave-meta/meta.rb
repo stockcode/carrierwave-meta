@@ -65,23 +65,25 @@ module CarrierWave
 
         is_dimensionable = is_image || is_pdf
 
-        manipulate! do |img|
-          if processor?(:rmagick, img) && is_dimensionable
-            size << img.columns
-            size << img.rows
-          elsif processor?(:mini_magick, img) && is_dimensionable
-            size << img['width']
-            size << img['height']
-          elsif processor?(:socrecy, img) && is_image
-            size << img.dimensions[:x].to_i
-            size << img.dimensions[:y].to_i
-          elsif processor?(:vips, img) && is_image
-            size << img.x_size
-            size << img.y_size
-          else
-            raise "Unsupported file type/image processor (use RMagick, MiniMagick, ImageSorcery, VIPS)"
+        if is_dimensionable then
+          manipulate! do |img|
+            if processor?(:rmagick, img) && is_dimensionable
+              size << img.columns
+              size << img.rows
+            elsif processor?(:mini_magick, img) && is_dimensionable
+              size << img['width']
+              size << img['height']
+            elsif processor?(:socrecy, img) && is_image
+              size << img.dimensions[:x].to_i
+              size << img.dimensions[:y].to_i
+            elsif processor?(:vips, img) && is_image
+              size << img.x_size
+              size << img.y_size
+            else
+              raise "Unsupported file type/image processor (use RMagick, MiniMagick, ImageSorcery, VIPS)"
+            end
+            img
           end
-          img
         end
       end
     rescue CarrierWave::ProcessingError
